@@ -88,4 +88,12 @@ public class FakeStoreproductService implements ProductService{
         return product;
     }
 
+    public List<Category> getAllCategories(){
+        return null;
+    }
+
+    public List<Product> getProductsByCategory(String category){
+        return null;
+    }
+
 }

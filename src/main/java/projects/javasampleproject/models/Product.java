@@ -17,4 +17,8 @@ public class Product extends BaseModel {
     private String description;
     private String imageUrl;
 
+    public void print() {
+        System.out.println(this.title);
+        System.out.println(this.category.getName());
+    }
 }
