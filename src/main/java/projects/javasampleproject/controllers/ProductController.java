@@ -1,5 +1,6 @@
 package projects.javasampleproject.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -11,10 +12,12 @@ import org.springframework.web.client.RestTemplate;
 import projects.javasampleproject.Exceptions.ProductNotFoundException;
 import projects.javasampleproject.commons.AuthenticationCommons;
 import projects.javasampleproject.dto.Role;
+import projects.javasampleproject.dto.SendEmailEventDTO;
 import projects.javasampleproject.dto.UserDto;
 import projects.javasampleproject.models.Category;
 import projects.javasampleproject.models.Product;
 import projects.javasampleproject.services.FakeStoreproductService;
+import projects.javasampleproject.services.KafkaMessagePublisherService;
 import projects.javasampleproject.services.ProductService;
 
 import java.security.PublicKey;
@@ -28,12 +31,14 @@ public class ProductController {
     private ProductService productService;
     private RestTemplate restTemplate;
     private AuthenticationCommons authenticationCommons;
+    private KafkaMessagePublisherService kafkaMessagePublisherService;
 
     @Autowired
-    public ProductController(@Qualifier("selfProductService") ProductService productService, RestTemplate restTemplate, AuthenticationCommons authenticationCommons){
+    public ProductController(@Qualifier("selfProductService") ProductService productService, RestTemplate restTemplate, AuthenticationCommons authenticationCommons, KafkaMessagePublisherService kafkaMessagePublisherService){
         this.restTemplate=restTemplate;
         this.productService=productService;
         this.authenticationCommons=authenticationCommons;
+        this.kafkaMessagePublisherService=kafkaMessagePublisherService;
     }
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts(@RequestHeader("AuthenticationToken") String token){
@@ -102,5 +107,14 @@ public class ProductController {
     @GetMapping("/products/categories/{category}")
     public List<Product> getProductsByCategory(@PathVariable("category") String category){
         return productService.getProductsByCategory(category);
+    }
+
+    @PostMapping("/publishMessage")
+    public ResponseEntity<String> publishMessage(@RequestBody SendEmailEventDTO message) throws JsonProcessingException {
+
+        String response = kafkaMessagePublisherService.publishMessage(message);
+        return new ResponseEntity<>(
+                restTemplate.postForObject("http://localhost:8080/publish", message, String.class), HttpStatus.OK
+        );
     }
 }

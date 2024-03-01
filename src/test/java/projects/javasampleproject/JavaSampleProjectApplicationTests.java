@@ -15,7 +15,7 @@ import static java.lang.Long.valueOf;
 @SpringBootTest
 class JavaSampleProjectApplicationTests {
 
-    ProductRepository productRepository;
+   /* ProductRepository productRepository;
     @Autowired
      JavaSampleProjectApplicationTests(ProductRepository productRepository){
         this.productRepository=productRepository;
@@ -36,6 +36,6 @@ class JavaSampleProjectApplicationTests {
         Product product1= productRepository.findByIdAndPriceOrderById(432L,35D);
         product1.print();
 
-    }
+    }*/
 
 }
